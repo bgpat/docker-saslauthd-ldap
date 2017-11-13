@@ -1,0 +1,30 @@
+version: "3"
+services:
+  saslauthd:
+    image: bgpat/saslauthd-ldap
+#   build: .
+    environment:
+      LDAP_SERVERS: ldap://slapd
+      LDAP_BIND_DN: cn=Manager,dc=domain,dc=tld
+      LDAP_BIND_PW: adminpw
+      LDAP_SEARCH_BASE: ou=People,dc=domain,dc=tld
+      LDAP_FILTER: (&(objectClass=account)(uid=%u))
+  slapd:
+    image: bgpat/slapd
+    environment:
+      ADMIN_PW: adminpw
+      SCHEMAS: core cosine nis
+      INITIAL_LDIF: |
+        dn: ou=People,dc=domain,dc=tld
+        objectClass: organizationalUnit
+        ou: People
+        
+        dn: uid=bgpat,ou=People,dc=domain,dc=tld
+        objectClass: account
+        objectClass: posixAccount
+        uid: bgpat
+        cn: bgpat
+        uidNumber: 1000
+        gidNumber: 1000
+        homeDirectory: /home/bgpat
+        userPassword: passwd
